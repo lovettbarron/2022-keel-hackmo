@@ -1,29 +1,3 @@
-// model Todo {
-//     fields {
-//         complete Boolean @default(false)
-//         title Text
-//         description Text?
-//         completedAt Timestamp?
-//         owner Identity
-//     }
-//     operations {
-//         get todo(id)
-//         list allTodos(complete?) {
-//             @where(todo.owner == ctx.identity)
-//         }
-//         delete deleteTodo(id)
-//         update updateTodo(id) with (title?, description?)
-//         update setCompletion(id) with (complete)
-//         create createTodo() with (title, description?) {
-//             @permission(expression: ctx.isAuthenticated)
-//             @set(todo.owner = ctx.identity)
-//         }
-//     }
-//     @permission(
-//         actions: [get, list, update, delete],
-//         expression: todo.owner == ctx.identity
-//     )
-// }
 enum Day {
     Monday
     Tuesday
@@ -34,10 +8,15 @@ enum Day {
     Sunday
 }
 
+enum ShiftType {
+    Day
+    Night
+}
+
 model Organization {
     fields {
         name Text
-        location Location[]
+        floor Floor[]
     }
 
     operations {
@@ -58,6 +37,7 @@ model Shift {
     fields {
         name Text
         day Day
+        type ShiftType
         staff Staff[]
     }
 
@@ -66,7 +46,7 @@ model Shift {
         list allShift()
         delete deleteShift(id)
         update updateShift(id) with (name?)
-        create createShift() with (name, day)
+        create createShift() with (name, day, type)
     }
 
     @permission(
@@ -78,7 +58,8 @@ model Shift {
 model Staff {
     fields {
         name Text
-        shift Shift
+        shift Shift[]
+        skill Need[]
     }
 
     operations {
@@ -95,20 +76,22 @@ model Staff {
     )
 }
 
-model Location {
-    // Floor or external rpace w/ rooms
+model Floor {
+    // Floor or external space w/ rooms
     fields {
         name Text
         org Organization
         room Room[]
+        floormap String
+        // img
     }
 
     operations {
-        get location(id)
-        list allLocation()
-        delete deleteLocation(id)
-        update updateLocation(id) with (name?, org, room)
-        create createLocation() with (name, org.id, room)
+        get floor(id)
+        list allFloor()
+        delete deleteFloor(id)
+        update updateFloor(id) with (name?, org, room, floormap)
+        create createFloor() with (name, org.id, room, floormap)
     }
 
     @permission(
@@ -120,15 +103,18 @@ model Location {
 model Room {
     fields {
         name Text
-        location Location
+        floor Floor
+        x Number
+        // xy coord on img floormap to door
+        y Number
     }
 
     operations {
         get room(id)
         list allRoom()
         delete deleteRoom(id)
-        update updateRoom(id) with (name?, location)
-        create createRoom() with (name, location.id)
+        update updateRoom(id) with (name?, floor)
+        create createRoom() with (name, floor.id, x, y)
     }
 
     @permission(
@@ -140,15 +126,18 @@ model Room {
 model Patient {
     fields {
         name Text
+        age Number
+        checkin Checkin[]
         room Room
+        need Need[]
     }
 
     operations {
         get patient(id)
         list allPatient()
         delete deletePatient(id)
-        update updatePatient(id) with (name?, room)
-        create createPatient() with (name, room.id)
+        update updatePatient(id) with (name?, room, age)
+        create createPatient() with (name, room.id, age)
     }
 
     @permission(
@@ -170,6 +159,27 @@ model Tag {
         delete deleteTag(id)
         update updateTag(id) with (name?, room)
         create createTag() with (name, room.id)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Need {
+    fields {
+        name Text
+        patient Patient
+        staff Staff[]
+    }
+
+    operations {
+        get need(id)
+        list allNeed()
+        delete deleteNeed(id)
+        update updateNeed(id) with (name?)
+        create createNeed() with (name)
     }
 
     @permission(
@@ -207,7 +217,7 @@ api Web {
         Organization
         Shift
         Staff
-        Location
+        Floor
         Room
         Patient
         Tag
@@ -223,7 +233,7 @@ api Console {
         Organization
         Shift
         Staff
-        Location
+        Floor
         Room
         Patient
         Tag
