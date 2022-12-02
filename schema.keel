@@ -1,0 +1,44 @@
+model Todo {
+    fields {
+        complete Boolean @default(false)
+        title Text
+        description Text?
+        completedAt Timestamp?
+        owner Identity
+    }
+
+    operations {
+        get todo(id)
+        list allTodos(complete?) {
+            @where(todo.owner == ctx.identity)
+        }
+        delete deleteTodo(id)
+        update updateTodo(id) with (title?, description?)
+        update setCompletion(id) with (complete)
+        create createTodo() with (title, description?) {
+            @permission(expression: ctx.isAuthenticated)
+            @set(todo.owner = ctx.identity)
+        }
+    }
+
+    @permission(
+        actions: [get, list, update, delete],
+        expression: todo.owner == ctx.identity
+    )
+}
+
+api Web {
+    @graphql
+
+    models {
+        Todo
+    }
+}
+
+api Console {
+    @rpc
+
+    models {
+        Todo
+    }
+}
