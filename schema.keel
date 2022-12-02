@@ -27,11 +27,194 @@ model Todo {
     )
 }
 
+model Organization {
+    fields {
+        name Text
+        location Location[]
+    }
+
+    operations {
+        get organization(id)
+        list allOrganization()
+        delete deleteOrganization(id)
+        update updateOrganization(id) with (name?)
+        create createOrganization() with (name)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+enum Day {
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+    Sunday
+}
+
+model Shift {
+    fields {
+        name Text
+        day Day
+        staff Staff[]
+    }
+
+    operations {
+        get shift(id)
+        list allShift()
+        delete deleteShift(id)
+        update updateShift(id) with (name?)
+        create createShift() with (name, day)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Staff {
+    fields {
+        name Text
+        shift Shift
+    }
+
+    operations {
+        get staff(id)
+        list allStaff()
+        delete deleteStaff(id)
+        update updateStaff(id) with (name?, shift)
+        create createStaff() with (name, shift.id)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Location {
+    // Floor or external rpace w/ rooms
+    fields {
+        name Text
+        org Organization
+        room Room[]
+    }
+
+    operations {
+        get location(id)
+        list allLocation()
+        delete deleteLocation(id)
+        update updateLocation(id) with (name?, org, room)
+        create createLocation() with (name, org.id, room)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Room {
+    fields {
+        name Text
+        location Location
+    }
+
+    operations {
+        get room(id)
+        list allRoom()
+        delete deleteRoom(id)
+        update updateRoom(id) with (name?, location)
+        create createRoom() with (name, location.id)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Patient {
+    fields {
+        name Text
+        room Room
+    }
+
+    operations {
+        get patient(id)
+        list allPatient()
+        delete deletePatient(id)
+        update updatePatient(id) with (name?, room)
+        create createPatient() with (name, room.id)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Tag {
+    // Physical tag
+    fields {
+        name Text
+        room Room
+    }
+
+    operations {
+        get tag(id)
+        list allTag()
+        delete deleteTag(id)
+        update updateTag(id) with (name?, room)
+        create createTag() with (name, room.id)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
+model Checkin {
+    fields {
+        name Text
+        staff Staff
+        patient Patient
+    }
+
+    operations {
+        get checkin(id)
+        list allCheckin()
+        delete deleteCheckin(id)
+        update updateCheckin(id) with (name?, staff, patient)
+        create createCheckin() with (name, staff.id, patient.id)
+    }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
+}
+
 api Web {
     @graphql
 
     models {
         Todo
+        Organization
+        Shift
+        Staff
+        Location
+        Room
+        Patient
+        Tag
+        Checkin
     }
 }
 
@@ -40,5 +223,13 @@ api Console {
 
     models {
         Todo
+        Organization
+        Shift
+        Staff
+        Location
+        Room
+        Patient
+        Tag
+        Checkin
     }
 }
