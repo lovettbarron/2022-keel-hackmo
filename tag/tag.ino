@@ -4,7 +4,7 @@
 
  
 const char* ssid = "The House";
-const char* password =  "welcome!";
+const char* password = "welcome!";
  
  
 #define TFT_SCK    18
@@ -74,6 +74,10 @@ void setup(void)
 
 }
  
+void CheckInTag() {
+  
+}
+
 
  void writeBasic(String content)  {
 
