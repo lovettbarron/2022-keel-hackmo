@@ -38,7 +38,7 @@ model Shift {
         name Text
         day Day
         type ShiftType
-        staff Staff[]
+        staff StaffShift[]
     }
 
     operations {
@@ -58,7 +58,7 @@ model Shift {
 model Staff {
     fields {
         name Text
-        shift Shift[]
+        shift StaffShift[]
         skill Need[]
     }
 
@@ -67,7 +67,7 @@ model Staff {
         list allStaff()
         delete deleteStaff(id)
         update updateStaff(id) with (name?, shift)
-        create createStaff() with (name, shift.id)
+        create createStaff() with (name, staffShiftId)
     }
 
     @permission(
@@ -83,7 +83,6 @@ model Floor {
         org Organization
         room Room[]
         floormap String
-        // img
     }
 
     operations {

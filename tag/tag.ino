@@ -3,8 +3,8 @@
 #include <ESP32Ping.h>
 
  
-const char* ssid = "Midipatch";
-const char* password =  "midihaus";
+const char* ssid = "The House";
+const char* password =  "welcome!";
  
  
 #define TFT_SCK    18
