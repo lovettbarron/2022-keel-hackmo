@@ -146,10 +146,11 @@ model Patient {
 }
 
 model Tag {
-    // Physical tag
+    // Physical device tag
     fields {
         name Text
         room Room
+        device Text
     }
 
     operations {
@@ -157,7 +158,7 @@ model Tag {
         list allTag()
         delete deleteTag(id)
         update updateTag(id) with (name?, room)
-        create createTag() with (name, room.id)
+        create createTag() with (name, room.id, device)
     }
 
     @permission(
@@ -192,6 +193,7 @@ model Checkin {
         name Text
         staff Staff
         patient Patient
+        device Tag
     }
 
     operations {
@@ -199,7 +201,13 @@ model Checkin {
         list allCheckin()
         delete deleteCheckin(id)
         update updateCheckin(id) with (name?, staff, patient)
-        create createCheckin() with (name, staff.id, patient.id)
+        create createCheckin() with (name, staff.id, patient.id, device.id)
+    }
+
+    functions {
+        create deviceCheckin() with (name, staff.id, patient.id, device.id) {
+            @permission(expression: true)
+        }
     }
 
     @permission(
