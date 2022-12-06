@@ -59,7 +59,7 @@ model Staff {
     fields {
         name Text
         shift StaffShift[]
-        skill Need[]
+        skill NeedStaff[]
     }
 
     operations {
@@ -67,7 +67,7 @@ model Staff {
         list allStaff()
         delete deleteStaff(id)
         update updateStaff(id) with (name?, shift)
-        create createStaff() with (name, staffShiftId)
+        create createStaff() with (name, shift.id, skill.id)
     }
 
     @permission(
@@ -82,7 +82,7 @@ model Floor {
         name Text
         org Organization
         room Room[]
-        floormap String
+        floormap Text
     }
 
     operations {
@@ -170,7 +170,7 @@ model Need {
     fields {
         name Text
         patient Patient
-        staff Staff[]
+        staff NeedStaff[]
     }
 
     operations {
@@ -178,7 +178,7 @@ model Need {
         list allNeed()
         delete deleteNeed(id)
         update updateNeed(id) with (name?)
-        create createNeed() with (name)
+        create createNeed() with (name, staff.id, patient.id)
     }
 
     @permission(
@@ -208,6 +208,41 @@ model Checkin {
     )
 }
 
+// Connections
+model StaffShift {
+    fields {
+        staff Staff
+        shift Shift
+    }
+
+    operations {
+        create staffShift() with (staffId, shiftId)
+    }
+}
+
+model PatientNeeds {
+    fields {
+        patient Patient
+        need Need
+    }
+
+    operations {
+        create patientNeed() with (patientId, needId)
+    }
+}
+
+model NeedStaff {
+    fields {
+        staff Staff
+        need Need
+    }
+
+    operations {
+        create needStaff() with (needId, staffId)
+    }
+}
+
+// API
 api Web {
     @graphql
 
