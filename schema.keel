@@ -20,7 +20,7 @@ model Organization {
     }
 
     operations {
-        get organization(id)
+        get getOrganization(id)
         list allOrganization()
         delete deleteOrganization(id)
         update updateOrganization(id) with (name?)
@@ -89,8 +89,8 @@ model Floor {
         get floor(id)
         list allFloor()
         delete deleteFloor(id)
-        update updateFloor(id) with (name?, org.id, room.id, floormap)
-        create createFloor() with (name, org.id, room.id, floormap)
+        update updateFloor(id) with (name?, org.id, floormap)
+        create createFloor() with (name, org.id, floormap)
     }
 
     @permission(
