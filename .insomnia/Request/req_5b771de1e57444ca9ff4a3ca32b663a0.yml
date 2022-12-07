@@ -1,0 +1,29 @@
+_id: req_5b771de1e57444ca9ff4a3ca32b663a0
+type: Request
+parentId: fld_b5e57ed1b5044d9cb1c004b7c050b47e
+modified: 1670414638489
+created: 1670348802243
+url: http://localhost:8000/Web
+name: authenticate
+description: ""
+method: POST
+body:
+  mimeType: application/graphql
+  text: '{"query":"mutation {\n  authenticate(input: { \n    \tcreateIfNotExists:
+    true, \n    \temailPassword: { \n        email:\"asa@sds.com\",
+    \n        password:\"123\"\n      }\n    })
+    {\n\t\t\tidentityCreated\n    \ttoken\n  }\n}"}'
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/json
+    id: pair_c01e1757f03c4aaaa8c56e7fa87190a4
+authentication: {}
+metaSortKey: -1670348802243
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
