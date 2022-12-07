@@ -1,7 +1,7 @@
 _id: req_2d1acf9b1f174948b41483c5cbeda740
 type: Request
 parentId: fld_b5e57ed1b5044d9cb1c004b7c050b47e
-modified: 1670416761176
+modified: 1670417471566
 created: 1670415077836
 url: "{{ _.url }}/Web"
 name: updateOrganization
@@ -11,7 +11,7 @@ body:
   mimeType: application/graphql
   text: '{"query":"mutation {\n  updateOrganization(input: { \n\t\twhere:
     {\n\t\t\tid: \"2IaOCuVxXGv3hHIcoXqm2vWuI4N\"\n\t\t},\n\t\tvalues:
-    {\n\t\t\tname: \"Update Test\"\n\t\t}\n  \t\n    })
+    {\n\t\t\tname: \"TEST\"\n\t\t}\n  \t\n    })
     {\n\t\t\tid\n\t\t\tname\n  }\n}"}'
 parameters: []
 headers:
