@@ -16,7 +16,7 @@ enum ShiftType {
 model Organization {
     fields {
         name Text
-        floor Floor[]
+        floors Floor[]
     }
 
     operations {
@@ -66,7 +66,7 @@ model Staff {
         get staff(id)
         list allStaff()
         delete deleteStaff(id)
-        update updateStaff(id) with (name?, shift)
+        update updateStaff(id) with (name?, shift.id)
         create createStaff() with (name, shift.id, skill.id)
     }
 
@@ -89,8 +89,8 @@ model Floor {
         get floor(id)
         list allFloor()
         delete deleteFloor(id)
-        update updateFloor(id) with (name?, org, room, floormap)
-        create createFloor() with (name, org.id, room, floormap)
+        update updateFloor(id) with (name?, org.id, room.id, floormap)
+        create createFloor() with (name, org.id, room.id, floormap)
     }
 
     @permission(
@@ -112,7 +112,7 @@ model Room {
         get room(id)
         list allRoom()
         delete deleteRoom(id)
-        update updateRoom(id) with (name?, floor)
+        update updateRoom(id) with (name?, floor.id)
         create createRoom() with (name, floor.id, x, y)
     }
 
@@ -135,7 +135,7 @@ model Patient {
         get patient(id)
         list allPatient()
         delete deletePatient(id)
-        update updatePatient(id) with (name?, room, age)
+        update updatePatient(id) with (name?, room.id, age)
         create createPatient() with (name, room.id, age)
     }
 
@@ -157,7 +157,7 @@ model Tag {
         get tag(id)
         list allTag()
         delete deleteTag(id)
-        update updateTag(id) with (name?, room)
+        update updateTag(id) with (name?, room.id)
         create createTag() with (name, room.id, device)
     }
 
@@ -200,7 +200,7 @@ model Checkin {
         get checkin(id)
         list allCheckin()
         delete deleteCheckin(id)
-        update updateCheckin(id) with (name?, staff, patient)
+        update updateCheckin(id) with (name?, staff.id, patient.id)
         create createCheckin() with (name, staff.id, patient.id, device.id)
     }
 
@@ -264,6 +264,7 @@ api Web {
         Patient
         Tag
         Checkin
+        Identity
     }
 }
 
