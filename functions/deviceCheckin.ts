@@ -1,15 +1,15 @@
-import { DeviceCheckin } from '@teamkeel/sdk'
+import { DeviceCheckin, Checkin } from '@teamkeel/sdk'
 
 export default DeviceCheckin(async (inputs, api) => {
   // Build something awesome
 
-  
-  const { name, staff, patient, device } = inputs
+  const { name, staffId, patientId, deviceId } = inputs
 
-  return {
-  name: name,
-  staff: staff,
-  patient: patient,
-  device: device
-  }
+  const values: Partial<Checkin> = {
+    ...inputs.values,
+  };
+
+  return api.models.checkin.create({
+    ...values,
+  });
 })
