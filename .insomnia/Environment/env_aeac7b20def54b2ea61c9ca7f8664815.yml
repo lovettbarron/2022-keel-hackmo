@@ -1,0 +1,14 @@
+_id: env_aeac7b20def54b2ea61c9ca7f8664815
+type: Environment
+parentId: env_6a0b55ab9f82d86367dc28886bff021912c16498
+modified: 1670416634027
+created: 1670416229822
+name: STAGING
+data:
+  url: https://staging--2022-keel-hackmo-n4WKU0.keelapps.xyz
+dataPropertyOrder:
+  "&":
+    - url
+color: null
+isPrivate: false
+metaSortKey: 1670416229822

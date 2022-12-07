@@ -1,9 +1,9 @@
 _id: req_afff78df89884584898829886196b752
 type: Request
 parentId: fld_b5e57ed1b5044d9cb1c004b7c050b47e
-modified: 1670415131432
+modified: 1670416712808
 created: 1670414917857
-url: http://localhost:8000/Web
+url: "{{ _.url }}/Web"
 name: listOrganization
 description: ""
 method: POST
