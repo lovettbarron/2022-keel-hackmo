@@ -1,0 +1,33 @@
+_id: req_afff78df89884584898829886196b752
+type: Request
+parentId: fld_b5e57ed1b5044d9cb1c004b7c050b47e
+modified: 1670415131432
+created: 1670414917857
+url: http://localhost:8000/Web
+name: listOrganization
+description: ""
+method: POST
+body:
+  mimeType: application/graphql
+  text: '{"query":"query {\n  allOrganization(input: { \n  \n    }) {\n\t\t\tedges
+    {\n\t\t\t\tnode
+    {\n\t\t\t\t\tid\n\t\t\t\t\tname\n\t\t\t\t}\n\t\t\t}\n  }\n}"}'
+parameters: []
+headers:
+  - name: Content-Type
+    value: application/json
+    id: pair_c01e1757f03c4aaaa8c56e7fa87190a4
+  - id: pair_3d6c5b5bbeec45c4a6c44715c2f3d6a1
+    name: Authorization
+    value: Bearer {% response 'body', 'req_5b771de1e57444ca9ff4a3ca32b663a0',
+      'b64::JC5kYXRhLmF1dGhlbnRpY2F0ZS50b2tlbg==::46b', 'never', 60 %}
+    description: ""
+authentication: {}
+metaSortKey: -1667796032359.875
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
