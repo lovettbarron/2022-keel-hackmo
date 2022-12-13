@@ -87,9 +87,10 @@ unsigned long interval = 30000;
 HTTPClient http; // Declare object of class HTTPClient
 // WiFiMulti WiFiMulti;
 
-String payload = "query { allPatient(input: {}) { edges { node { 	id name room { name	} age	} } } }";
+const chat *payload = "query {}";
 
 const char *host = "staging--2022-keel-hackmo-n4WKU0.keelapps.xyz";
+const char *fingerprint = "C5:16:8F:D4:3F:7D:CC:75:40:30:38:99:EA:F6:D4:34:70:02:8F:F4";
 
 Button b = {BUTTON, 0, false};
 unsigned long debounceDelay = 250; // the debounce time; increase if the output flickers
@@ -250,11 +251,51 @@ void updateKeelStruct()
       // }
       // // if there are incoming bytes available
       // // from the server, read them and print them:
-      // while (client->available())
-      // {
-      //   char c = client->read();
-      //   Serial.write(c);
-      // }
+
+      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
+      HTTPClient https;
+
+      Serial.print("[HTTPS] begin...\n");
+      if (https.begin(*client, host, 443, "/Web", true))
+      { // HTTPS
+        Serial.print("[HTTPS] POST...\n");
+        // start connection and send HTTP header
+        // https.addHeader("Content-Type", "application/json");
+        https.addHeader("Content-Type", "application/graphql");
+        int httpCode = https.POST(payload);
+        // while (client->available())
+        // {
+        //   char c = client->read();
+        //   Serial.write(c);
+        // }
+
+        // httpCode will be negative on error
+        if (httpCode > 0)
+        {
+
+          // HTTP header has been send and Server response header has been handled
+          Serial.printf("[HTTPS] POST... code: %d\n", httpCode);
+          String pay = https.getString();
+          Serial.println(pay);
+
+          // file found at server
+          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
+          {
+            String pay = https.getString();
+            Serial.println(pay);
+          }
+        }
+        else
+        {
+          Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+        }
+
+        https.end();
+      }
+      else
+      {
+        Serial.printf("[HTTPS] Unable to connect\n");
+      }
 
       client->stop();
     }
