@@ -6,36 +6,52 @@
 #include <HTTPClient.h>
 #include <WiFiClientSecure.h>
 
-const char *rootCACertificate =
-  "-----BEGIN CERTIFICATE-----\n"
-  "MIIDQTCCAimgAwIBAgITBmyfz5m/jAo54vB4ikPmljZbyjANBgkqhkiG9w0BAQsF\n"
-  "ADA5MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRkwFwYDVQQDExBBbWF6\n"
-  "b24gUm9vdCBDQSAxMB4XDTE1MDUyNjAwMDAwMFoXDTM4MDExNzAwMDAwMFowOTEL\n"
-  "MAkGA1UEBhMCVVMxDzANBgNVBAoTBkFtYXpvbjEZMBcGA1UEAxMQQW1hem9uIFJv\n"
-  "b3QgQ0EgMTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALJ4gHHKeNXj\n"
-  "ca9HgFB0fW7Y14h29Jlo91ghYPl0hAEvrAIthtOgQ3pOsqTQNroBvo3bSMgHFzZM\n"
-  "9O6II8c+6zf1tRn4SWiw3te5djgdYZ6k/oI2peVKVuRF4fn9tBb6dNqcmzU5L/qw\n"
-  "IFAGbHrQgLKm+a/sRxmPUDgH3KKHOVj4utWp+UhnMJbulHheb4mjUcAwhmahRWa6\n"
-  "VOujw5H5SNz/0egwLX0tdHA114gk957EWW67c4cX8jJGKLhD+rcdqsq08p8kDi1L\n"
-  "93FcXmn/6pUCyziKrlA4b9v7LWIbxcceVOF34GfID5yHI9Y/QCB/IIDEgEw+OyQm\n"
-  "jgSubJrIqg0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMC\n"
-  "AYYwHQYDVR0OBBYEFIQYzIU07LwMlJQuCFmcx7IQTgoIMA0GCSqGSIb3DQEBCwUA\n"
-  "A4IBAQCY8jdaQZChGsV2USggNiMOruYou6r4lK5IpDB/G/wkjUu0yKGX9rbxenDI\n"
-  "U5PMCCjjmCXPI6T53iHTfIUJrU6adTrCC2qJeHZERxhlbI1Bjjt/msv0tadQ1wUs\n"
-  "N+gDS63pYaACbvXy8MWy7Vu33PqUXHeeE6V/Uq2V8viTO96LXFvKWlJbYK8U90vv\n"
-  "o/ufQJVtMVT8QtPHRh8jrdkPSHCa2XV4cdFyQzR1bldZwgJcJmApzyMZFo6IQ6XU\n"
-  "5MsI+yMRQ+hDKXJioaldXgjUkK642M4UwtBV8ob2xJNDd2ZhwLnoQdeXeGADbkpy\n"
-  "rqXRfboQnoZsG4q5WTP468SQvvG5"
-  "-----END CERTIFICATE-----\n";
+const char *rootCACertificate = //"C5:16:8F:D4:3F:7D:CC:75:40:30:38:99:EA:F6:D4:34:70:02:8F:F4";
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIF1DCCBLygAwIBAgIQDPUXjEzsDcfAT+ZjzUJmizANBgkqhkiG9w0BAQsFADBG\n"
+    "MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRUwEwYDVQQLEwxTZXJ2ZXIg\n"
+    "Q0EgMUIxDzANBgNVBAMTBkFtYXpvbjAeFw0yMjEwMDcwMDAwMDBaFw0yMzExMDUy\n"
+    "MzU5NTlaMBkxFzAVBgNVBAMMDioua2VlbGFwcHMueHl6MIIBIjANBgkqhkiG9w0B\n"
+    "AQEFAAOCAQ8AMIIBCgKCAQEAliPsxphaJMaDtQSkFenbVPt471arSNQVCnDT7naH\n"
+    "xNsw+9IuyVUDkPOK3m0Tx32o871YhdqukuhL2rm/KSGu/JXbAgCxor1tlAyxEXCs\n"
+    "asR/zdYxITYPpJTplQ7puw8IG1vZgd99YsOFdOfW040RJrE+wzgbehgvCJDVdncl\n"
+    "HvYEmD1vjqUbaj4ZPlbgiWruivD1aeFSrPGfpIHbLA6WPPlxewUyTNyPlB34j8+D\n"
+    "OpzOcqXRgG8TB/K010gFXQWK6dzUejYn135rpuPb3b4K5ZfJy30wIWUL86/+8xbA\n"
+    "2Y6WRCf9os19dAjIcdzzdyCMlKpujwnVeK5OuPLyiYi/rwIDAQABo4IC6TCCAuUw\n"
+    "HwYDVR0jBBgwFoAUWaRmBlKge5WSPKOUByeWdFv5PdAwHQYDVR0OBBYEFJwlEqpc\n"
+    "TFoAIG7Z7m2NMSOEkoo4MBkGA1UdEQQSMBCCDioua2VlbGFwcHMueHl6MA4GA1Ud\n"
+    "DwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwPQYDVR0f\n"
+    "BDYwNDAyoDCgLoYsaHR0cDovL2NybC5zY2ExYi5hbWF6b250cnVzdC5jb20vc2Nh\n"
+    "MWItMS5jcmwwEwYDVR0gBAwwCjAIBgZngQwBAgEwdQYIKwYBBQUHAQEEaTBnMC0G\n"
+    "CCsGAQUFBzABhiFodHRwOi8vb2NzcC5zY2ExYi5hbWF6b250cnVzdC5jb20wNgYI\n"
+    "KwYBBQUHMAKGKmh0dHA6Ly9jcnQuc2NhMWIuYW1hem9udHJ1c3QuY29tL3NjYTFi\n"
+    "LmNydDAMBgNVHRMBAf8EAjAAMIIBfgYKKwYBBAHWeQIEAgSCAW4EggFqAWgAdgDo\n"
+    "PtDaPvUGNTLnVyi8iWvJA9PL0RFr7Otp4Xd9bQa9bgAAAYOyYIqyAAAEAwBHMEUC\n"
+    "IExMQd19+/BclZMtPHHIcVDheOIrrXDO7NomhpiuDi6tAiEAhV5EBY/A78qEoONn\n"
+    "tRJ7g3h2Pzwtf8s3U4zDlydmLTEAdgCzc3cH4YRQ+GOG1gWp3BEJSnktsWcMC4fc\n"
+    "8AMOeTalmgAAAYOyYIsXAAAEAwBHMEUCIQDOV6KbwE6YhtqN3DM5WWzx/Ub2R4Z3\n"
+    "jxZ11KMF5MJJMAIgTDziw65J/mp5zNWCTGbFFLoz5bZT94JkIOEvKhGuN2kAdgC3\n"
+    "Pvsk35xNunXyOcW6WPRsXfxCz3qfNcSeHQmBJe20mQAAAYOyYIrqAAAEAwBHMEUC\n"
+    "IQCvdTtgatbPcBlRjDX9nskYigBOOY79fBxrlQ+Ge7URBQIgL6qnvgWvz7WOjHA6\n"
+    "a7fNMpufpIg+md3DmQtw7gwNeXQwDQYJKoZIhvcNAQELBQADggEBACa6bZvTxJck\n"
+    "vOBsgX6pHrPqpucNQcFcbLn5GoP7gvtCH/AgBSRt5f0Di+iMY4bPW2JNa2/h0XQX\n"
+    "atInjf521461zC+fskNV1fBNQh6gwuPhHm8lloZKAY4Ahu9BoUwvZVCbPJPkH2L1\n"
+    "/0ztNg2PvhmyAxWHFoSLBxuK8LARLJeCYu91Wu4SfbYbtiHInDJfyU/wQ7OUcBtc\n"
+    "s/9OQyKMaIOGkgI5XLOTBkkHrp6uzQcu0S1ABo7Nrv/gxbogHjyo4BKSt6zxiCjQ\n"
+    "lXwy/taMjmouIzFo7k/VUU/MucMxjIhH86dq2YFk2D7kAj5AhBgYWByQysTy7iBp\n"
+    "dyUrvjp/uak=\n"
+    "-----END CERTIFICATE-----\n";
 
-struct Button {
+struct Button
+{
   const uint8_t PIN;
   uint32_t numberKeyPresses;
   uint32_t pressedTime;
   bool pressed;
 };
 
-struct Keel {
+struct Keel
+{
   char tagid;
   char patientname;
   char room;
@@ -43,12 +59,13 @@ struct Keel {
   char needs;
 };
 
-struct Screen {
+struct Screen
+{
   uint32_t x;
   uint32_t y;
 };
 
-Screen s = { 320, 240 };
+Screen s = {320, 240};
 
 #define TFT_SCK 18
 #define TFT_MOSI 23
@@ -67,22 +84,21 @@ Arduino_ILI9341 display = Arduino_ILI9341(&bus, TFT_RESET);
 unsigned long previousMillis = 0;
 unsigned long interval = 30000;
 
-HTTPClient http;  // Declare object of class HTTPClient
+HTTPClient http; // Declare object of class HTTPClient
 // WiFiMulti WiFiMulti;
 
 String payload = "query { allPatient(input: {}) { edges { node { 	id name room { name	} age	} } } }";
 
+const char *host = "staging--2022-keel-hackmo-n4WKU0.keelapps.xyz";
 
-const char *host = "https://staging--2022-keel-hackmo-n4WKU0.keelapps.xyz";
-const char *fingerprint = "123456789";
-
-Button b = { BUTTON, 0, false };
-unsigned long debounceDelay = 250;  // the debounce time; increase if the output flickers
-
+Button b = {BUTTON, 0, false};
+unsigned long debounceDelay = 250; // the debounce time; increase if the output flickers
 
 // Button interrept
-void IRAM_ATTR ISR() {
-  if ((millis() - b.pressedTime) > debounceDelay) {
+void IRAM_ATTR ISR()
+{
+  if ((millis() - b.pressedTime) > debounceDelay)
+  {
     b.numberKeyPresses++;
     b.pressed = true;
     b.pressedTime = millis();
@@ -90,12 +106,14 @@ void IRAM_ATTR ISR() {
 }
 
 // Set clock
-void setClock() {
+void setClock()
+{
   configTime(0, 0, "pool.ntp.org");
 
   Serial.print(F("Waiting for NTP time sync: "));
   time_t nowSecs = time(nullptr);
-  while (nowSecs < 8 * 3600 * 2) {
+  while (nowSecs < 8 * 3600 * 2)
+  {
     delay(500);
     Serial.print(F("."));
     yield();
@@ -109,10 +127,9 @@ void setClock() {
   Serial.print(asctime(&timeinfo));
 }
 
-
-
 // Basic Wifi
-void initWiFi() {
+void initWiFi()
+{
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   writeBasic("Hello, Keel!");
@@ -122,14 +139,17 @@ void initWiFi() {
   WiFi.persistent(true);
 }
 
-void checkInternet() {
-  while (WiFi.status() != WL_CONNECTED) {
+void checkInternet()
+{
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     writeBasic("Connecting to Wifi");
 
     bool success = Ping.ping("https://google.com", 3);
 
-    if (!success) {
+    if (!success)
+    {
       writeBasic("No internet");
       delay(5000);
       checkInternet();
@@ -139,10 +159,12 @@ void checkInternet() {
   }
 }
 
-void maintainConnection() {
+void maintainConnection()
+{
   unsigned long currentMillis = millis();
   // if WiFi is down, try reconnecting every CHECK_WIFI_TIME seconds
-  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >= interval)) {
+  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >= interval))
+  {
     Serial.print(millis());
     writeBasic("Retrying Wifi");
 
@@ -153,7 +175,8 @@ void maintainConnection() {
 }
 
 // Sketch Setup
-void setup(void) {
+void setup(void)
+{
   display.begin();
   Serial.begin(115200);
 
@@ -161,10 +184,12 @@ void setup(void) {
   attachInterrupt(BUTTON, ISR, FALLING);
 
   initWiFi();
+  // Serial.print(rootCACertificate);
 }
 
 // Basic text writing
-void writeBasic(String content) {
+void writeBasic(String content)
+{
 
   display.setRotation(3);
   display.fillScreen(BLACK);
@@ -179,9 +204,11 @@ void writeBasic(String content) {
   display.print(WiFi.localIP());
 }
 
-void loop() {
+void loop()
+{
 
-  if (b.pressed) {
+  if (b.pressed)
+  {
     writeBasic(String(b.numberKeyPresses));
     b.pressed = false;
     updateKeelStruct();
@@ -190,52 +217,50 @@ void loop() {
   maintainConnection();
 }
 
-
-
-
-
-
-void updateKeelStruct() {
+void updateKeelStruct()
+{
   WiFiClientSecure *client = new WiFiClientSecure;
-  if (client) {
+  if (client)
+  {
+    client->setInsecure();
     client->setCACert(rootCACertificate);
+    client->setTimeout(15);
 
+    if (!client->connect(host, 443))
     {
-      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
-      HTTPClient https;
-
-      Serial.print("[HTTPS] begin...\n");
-      if (https.begin(*client, host, 443, "/Web", true)) {  // HTTPS
-        Serial.print("[HTTPS] post...\n");
-        // start connection and send HTTP header
-        https.addHeader("Content-Type", "application/json");
-
-        int httpCode = https.POST(payload);  // post w/ payload
-
-        // httpCode will be negative on error
-        if (httpCode > 0) {
-          // HTTP header has been send and Server response header has been handled
-          Serial.printf("[HTTPS] post... code: %d\n", httpCode);
-
-          // file found at server
-          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-            String payload = https.getString();
-            Serial.println(payload);
-          }
-        } else {
-          Serial.printf("[HTTPS] post... failed, error: %s %s\n", String(httpCode), https.errorToString(httpCode).c_str());
-        }
-
-        https.end();
-      } else {
-        Serial.printf("[HTTPS] Unable to connect\n");
-      }
-
-      // End extra scoping block
+      Serial.println("Connection failed!");
     }
+    else
+    {
+      Serial.println("Connected to server!");
 
-    delete client;
-  } else {
+      client->println("GET https://staging--2022-keel-hackmo-n4WKU0.keelapps.xyz/Web HTTP/1.0");
+      client->println("Host: staging--2022-keel-hackmo-n4WKU0.keelapps.xyz");
+      client->println("Connection: close");
+      client->println();
+
+      // while (client->connected())
+      // {
+      //   String line = client->readStringUntil('\n');
+      //   if (line == "\r")
+      //   {
+      //     Serial.println("headers received");
+      //     break;
+      //   }
+      // }
+      // // if there are incoming bytes available
+      // // from the server, read them and print them:
+      // while (client->available())
+      // {
+      //   char c = client->read();
+      //   Serial.write(c);
+      // }
+
+      client->stop();
+    }
+  }
+  else
+  {
     Serial.println("Unable to create client");
   }
 }
