@@ -5,8 +5,8 @@ model Staff {
     }
 
     operations {
-        get staff(id)
-        list allStaff()
+        get getStaff(id)
+        list listAllStaff()
         delete deleteStaff(id)
         create createStaff() with (name, skill.id)
     }
@@ -23,8 +23,8 @@ model Room {
     }
 
     operations {
-        get room(id)
-        list allRoom()
+        get getRoom(id)
+        list listAllRoom()
         delete deleteRoom(id)
         create createRoom() with (name)
     }
@@ -45,8 +45,8 @@ model Patient {
     }
 
     operations {
-        get patient(id)
-        list allPatient()
+        get getPatient(id)
+        list listAllPatient()
         delete deletePatient(id)
         create createPatient() with (name, room.id, age)
     }
@@ -66,8 +66,8 @@ model Tag {
     }
 
     operations {
-        get tag(id)
-        list allTag()
+        get getTag(id)
+        list listAllTag()
         delete deleteTag(id)
         update updateTag(id) with (name?, room.id)
         create createTag() with (name, room.id, device)
@@ -87,8 +87,8 @@ model Need {
     }
 
     operations {
-        get need(id)
-        list allNeed()
+        get getNeed(id)
+        list listAllNeed()
         delete deleteNeed(id)
         update updateNeed(id) with (name?)
         create createNeed() with (name, staff.id, patient.id)
@@ -109,8 +109,8 @@ model Checkin {
     }
 
     operations {
-        get checkin(id)
-        list allCheckin()
+        get getCheckin(id)
+        list listAllCheckin()
         delete deleteCheckin(id)
         create createCheckin() with (name, staff.id, patient.id, device.id)
     }
