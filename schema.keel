@@ -1,96 +1,14 @@
-enum Day {
-    Monday
-    Tuesday
-    Wednesday
-    Thursday
-    Friday
-    Saturday
-    Sunday
-}
-
-enum ShiftType {
-    Day
-    Night
-}
-
-model Organization {
-    fields {
-        name Text
-        floors Floor[]
-    }
-
-    operations {
-        get getOrganization(id)
-        list allOrganization()
-        delete deleteOrganization(id)
-        update updateOrganization(id) with (name?)
-        create createOrganization() with (name)
-    }
-
-    @permission(
-        actions: [get, list, update, delete, create],
-        expression: true
-    )
-}
-
-model Shift {
-    fields {
-        name Text
-        day Day
-        type ShiftType
-        staff StaffShift[]
-    }
-
-    operations {
-        get shift(id)
-        list allShift()
-        delete deleteShift(id)
-        update updateShift(id) with (name?)
-        create createShift() with (name, day, type)
-    }
-
-    @permission(
-        actions: [get, list, update, delete, create],
-        expression: true
-    )
-}
-
 model Staff {
     fields {
         name Text
-        shift StaffShift[]
-        skill NeedStaff[]
+        skill StaffNeed[]
     }
 
     operations {
         get staff(id)
         list allStaff()
         delete deleteStaff(id)
-        update updateStaff(id) with (name?, shift.id)
-        create createStaff() with (name, shift.id, skill.id)
-    }
-
-    @permission(
-        actions: [get, list, update, delete, create],
-        expression: true
-    )
-}
-
-model Floor {
-    // Floor or external space w/ rooms
-    fields {
-        name Text
-        org Organization
-        room Room[]
-        floormap Text
-    }
-
-    operations {
-        get floor(id)
-        list allFloor()
-        delete deleteFloor(id)
-        update updateFloor(id) with (name?, org.id, floormap)
-        create createFloor() with (name, org.id, floormap)
+        create createStaff() with (name, skill.id)
     }
 
     @permission(
@@ -102,18 +20,13 @@ model Floor {
 model Room {
     fields {
         name Text
-        floor Floor
-        x Number
-        // xy coord on img floormap to door
-        y Number
     }
 
     operations {
         get room(id)
         list allRoom()
         delete deleteRoom(id)
-        update updateRoom(id) with (name?, floor.id)
-        create createRoom() with (name, floor.id, x, y)
+        create createRoom() with (name)
     }
 
     @permission(
@@ -135,7 +48,6 @@ model Patient {
         get patient(id)
         list allPatient()
         delete deletePatient(id)
-        update updatePatient(id) with (name?, room.id, age)
         create createPatient() with (name, room.id, age)
     }
 
@@ -171,7 +83,7 @@ model Need {
     fields {
         name Text
         patient Patient
-        staff NeedStaff[]
+        staff StaffNeed[]
     }
 
     operations {
@@ -200,7 +112,6 @@ model Checkin {
         get checkin(id)
         list allCheckin()
         delete deleteCheckin(id)
-        update updateCheckin(id) with (name?, staff.id, patient.id)
         create createCheckin() with (name, staff.id, patient.id, device.id)
     }
 
@@ -216,38 +127,36 @@ model Checkin {
     )
 }
 
-// Connections
-model StaffShift {
-    fields {
-        staff Staff
-        shift Shift
-    }
-
-    operations {
-        create staffShift() with (staffId, shiftId)
-    }
-}
-
-model PatientNeeds {
+model PatientNeed {
     fields {
         patient Patient
         need Need
     }
 
     operations {
-        create patientNeed() with (patientId, needId)
+        create createPatientNeed() with (patientId, needId)
     }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
 }
 
-model NeedStaff {
+model StaffNeed {
     fields {
         staff Staff
         need Need
     }
 
     operations {
-        create needStaff() with (needId, staffId)
+        create createStaffNeed() with (needId, staffId)
     }
+
+    @permission(
+        actions: [get, list, update, delete, create],
+        expression: true
+    )
 }
 
 // API
@@ -255,15 +164,14 @@ api Web {
     @graphql
 
     models {
-        Todo
-        Organization
-        Shift
         Staff
-        Floor
         Room
         Patient
         Tag
+        Need
         Checkin
+        PatientNeed
+        StaffNeed
         Identity
     }
 }
@@ -272,14 +180,14 @@ api Console {
     @rpc
 
     models {
-        Todo
-        Organization
-        Shift
         Staff
-        Floor
         Room
         Patient
         Tag
+        Need
         Checkin
+        PatientNeed
+        StaffNeed
+        Identity
     }
 }
