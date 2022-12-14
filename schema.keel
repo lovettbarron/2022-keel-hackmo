@@ -8,7 +8,7 @@ model Staff {
         get getStaff(id)
         list listAllStaff()
         delete deleteStaff(id)
-        create createStaff() with (name, skill.id)
+        create createStaff() with (name)
     }
 
     @permission(
