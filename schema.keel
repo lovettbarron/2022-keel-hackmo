@@ -41,7 +41,6 @@ model Patient {
         age Number
         checkin Checkin[]
         room Room
-        need Need[]
     }
 
     operations {
@@ -82,7 +81,7 @@ model Tag {
 model Need {
     fields {
         name Text
-        patient Patient
+        patients PatientNeed[]
         staff StaffNeed[]
     }
 
@@ -90,8 +89,7 @@ model Need {
         get getNeed(id)
         list listAllNeed()
         delete deleteNeed(id)
-        update updateNeed(id) with (name?)
-        create createNeed() with (name, staff.id, patient.id)
+        create createNeed() with (name)
     }
 
     @permission(
