@@ -1,5 +1,5 @@
 #include <Arduino_GFX_Library.h>
-
+#include <ArduinoJson.h>
 #include <WiFi.h>
 // #include <WiFiMulti.h>
 #include <ESP32Ping.h>
@@ -11,6 +11,8 @@ struct Button {
   uint32_t numberKeyPresses;
   uint32_t pressedTime;
   bool pressed;
+  bool longPress;
+  bool complete;
 };
 
 struct Keel {
@@ -36,8 +38,8 @@ Screen s = { 320, 240 };
 #define TFT_RESET 17
 #define BUTTON 16
 
-const char *ssid = "The House";
-const char *password = "welcome!";
+const char *ssid = "Midipatch";
+const char *password = "midihaus";
 
 Arduino_ESP32SPI bus = Arduino_ESP32SPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI, TFT_MISO);
 Arduino_ILI9341 display = Arduino_ILI9341(&bus, TFT_RESET);
@@ -46,24 +48,64 @@ unsigned long previousMillis = 0;
 unsigned long interval = 30000;
 
 HTTPClient http;  // Declare object of class HTTPClient
+
 // WiFiMulti WiFiMulti;
 
-String payload = "query { allPatient(input: {}) { edges { node { 	id name room { name	} age	} } } }";
+const char *payload = "{\"query\":\"query {\\n  allPatient(input: {}) {\\n\\t\\tedges {\\n\\t\\t\\tnode {\\n\\t\\t\\t\\tid\\n\\t\\t\\t\\tname\\n\\t\\t\\t\\troom {\\n\\t\\t\\t\\t\\tname\\n\\t\\t\\t\\t}\\n\\t\\t\\t\\tage\\n\\t\\t\\t}\\n\\t\\t}\\n  }\\n}\"}";
 
+const char *patientQuery = "";
+const char *CheckinQuery = "";
+const char *AvailableNurse = "";
 
-const char *host = "https://staging--2022-keel-hackmo-n4WKU0.keelapps.xyz/Web";
-const char *fingerprint = "123456789";
+const char *host = "staging--2022-keel-hackmo-n4WKU0.keelapps.xyz";
+const char *fingerprint = "C5:16:8F:D4:3F:7D:CC:75:40:30:38:99:EA:F6:D4:34:70:02:8F:F4";
 
-Button b = { BUTTON, 0, false };
-unsigned long debounceDelay = 250;  // the debounce time; increase if the output flickers
+Button b = { BUTTON, 0, false, false, false };
+unsigned long debounceDelay = 50;       // the debounce time; increase if the output flickers
+unsigned long longPressDuration = 500;  // long vs short press diff
 
-
-// Button tinterrept
+// Button interrupt
 void IRAM_ATTR ISR() {
   if ((millis() - b.pressedTime) > debounceDelay) {
-    b.numberKeyPresses++;
-    b.pressed = true;
-    b.pressedTime = millis();
+    if (digitalRead(BUTTON) == HIGH)  // Has peen released
+    {
+
+      if (b.pressed) {
+        if ((millis() - b.pressedTime) > longPressDuration) {
+
+          b.longPress = true;
+          b.complete = true;
+        } else {
+          b.complete = true;
+        }
+      }
+    } else {
+      b.pressed = true;
+
+      if (!b.complete) {
+        b.numberKeyPresses++;
+      }
+      b.pressedTime = millis();
+      b.longPress = false;
+      b.complete = false;
+    }
+  }
+}
+
+void resetButton() {
+  b.pressedTime = millis();
+  b.pressed = false;
+  b.complete = false;
+  b.longPress = false;
+  Serial.println("ResetButton");
+}
+
+void timeoutButton() {
+  if (digitalRead(BUTTON) == HIGH)  // Has peen released
+  {
+    if ((millis() - b.pressedTime) > debounceDelay + 2000) {
+      resetButton();
+    }
   }
 }
 
@@ -87,15 +129,18 @@ void setClock() {
   Serial.print(asctime(&timeinfo));
 }
 
-
-
 // Basic Wifi
 void initWiFi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   writeBasic("Hello, Keel!");
-  delay(500);
+  checkInternet();
+  Serial.println(WiFi.localIP());
+  WiFi.setAutoReconnect(true);
+  WiFi.persistent(true);
+}
 
+void checkInternet() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     writeBasic("Connecting to Wifi");
@@ -104,17 +149,12 @@ void initWiFi() {
 
     if (!success) {
       writeBasic("No internet");
-      delay(5000);
-      initWiFi();
+      delay(2000);
+      checkInternet();
     }
     setClock();
     writeBasic("Internet");
   }
-
-  delay(2000);
-  Serial.println(WiFi.localIP());
-  WiFi.setAutoReconnect(true);
-  WiFi.persistent(true);
 }
 
 void maintainConnection() {
@@ -136,9 +176,10 @@ void setup(void) {
   Serial.begin(115200);
 
   pinMode(BUTTON, INPUT_PULLUP);
-  attachInterrupt(BUTTON, ISR, FALLING);
+  attachInterrupt(BUTTON, ISR, CHANGE);
 
   initWiFi();
+  // Serial.print(rootCACertificate);
 }
 
 // Basic text writing
@@ -159,49 +200,60 @@ void writeBasic(String content) {
 
 void loop() {
 
-  if (b.pressed) {
-    writeBasic(String(b.numberKeyPresses));
-    b.pressed = false;
-    updateKeelStruct();
+  if (b.complete) {
+    if (b.longPress) {
+      writeBasic(String(String(b.numberKeyPresses) + " Long"));
+    } else {
+      writeBasic(String(String(b.numberKeyPresses) + " Short"));
+    }
+    // updateKeelStruct();
+    resetButton();
   }
-
+  timeoutButton();
   maintainConnection();
 }
 
-
-
-
-
-
 void updateKeelStruct() {
-  WiFiClient *client = new WiFiClient;
+  WiFiClientSecure *client = new WiFiClientSecure;
   if (client) {
+    client->setInsecure();
     // client->setCACert(rootCACertificate);
+    client->setTimeout(15);
 
-    {
+    if (!client->connect(host, 443)) {
+      Serial.println("Connection failed!");
+    } else {
+      Serial.println("Connected to server!");
+
       // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
       HTTPClient https;
 
       Serial.print("[HTTPS] begin...\n");
-      if (https.begin(*client, host)) {  // HTTPS
-        Serial.print("[HTTPS] post...\n");
+      if (https.begin(*client, host, 443, "/Web", true)) {  // HTTPS
+        Serial.print("[HTTPS] POST...\n");
         // start connection and send HTTP header
-        https.addHeader("Content-Type", "application/json");
-
+        // https.addHeader("Content-Type", "application/json");
+        https.addHeader("Content-Type", "application/graphql");
         int httpCode = https.POST(payload);
 
         // httpCode will be negative on error
         if (httpCode > 0) {
+
           // HTTP header has been send and Server response header has been handled
-          Serial.printf("[HTTPS] post... code: %d\n", httpCode);
+          Serial.printf("[HTTPS] POST... code: %d\n", httpCode);
 
           // file found at server
           if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-            String payload = https.getString();
-            Serial.println(payload);
+            String pay = https.getString();
+            Serial.println(pay);
+            // DynamicJsonDocument doc(1024);
+            // deserializeJson(doc, pay);
+          } else {
+            String pay = https.getString();
+            Serial.println(pay);
           }
         } else {
-          Serial.printf("[HTTPS] post... failed, error: %s\n", https.errorToString(httpCode).c_str());
+          Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
         }
 
         https.end();
@@ -209,9 +261,9 @@ void updateKeelStruct() {
         Serial.printf("[HTTPS] Unable to connect\n");
       }
 
-      // End extra scoping block
+      client->stop();
     }
-
-    delete client;
+  } else {
+    Serial.println("Unable to create client");
   }
 }
