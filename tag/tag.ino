@@ -27,23 +27,25 @@ struct Button
 
 struct Keel
 {
-  char id[32];
-  char patientname[32];
-  char room[32];
+  String id;
+  String patientname;
+  String room;
   uint32_t lastChecked;
-  char needs[32];
+  String needs;
 };
+
+Keel device = {String("123"), String("123"), String("123"), 0, String("123")};
 
 struct Staff
 {
-  unsigned char id;
-  unsigned char name;
+  String id;
+  String name;
   bool selected;
   bool active;
 };
 
 Staff staff_array[6];
-int staff_select = -1;
+int staff_select = 0;
 
 struct Screen
 {
@@ -63,6 +65,8 @@ Screen s = {OFFLINE, 320, 240, true};
 #define TFT_RESET 17
 #define BUTTON 16
 
+const char *tagid = "2Ivb1VZWbVEiC01Tvw740sU6g56";
+
 const char *ssid = "Midipatch";
 const char *password = "midihaus";
 
@@ -81,7 +85,7 @@ HTTPClient http; // Declare object of class HTTPClient
 
 // WiFiMulti WiFiMulti;
 
-const char *patientQuery = "";
+const char *patientQuery = "{\"query\":\"query { getTag(input: {id: \"2Ivb1VZWbVEiC01Tvw740sU6g56\" }) { name room { id name } } } \"}";
 const char *CheckinQuery = "";
 const char *AvailableStaff = "{\"query\":\"query {\\n  listAllStaff(input: {}) {\\n\\t\\tedges {\\n\\t\\t\\tnode {\\n\\t\\t\\t\\tid\\n\\t\\t\\t\\tname\\n\\t\\t\\t}\\n\\t\\t}\\n  }\\n}\"}";
 
@@ -231,6 +235,7 @@ void setup(void)
   attachInterrupt(BUTTON, ISR, CHANGE);
 
   initWiFi();
+
   // Serial.print(rootCACertificate);
 }
 
@@ -262,21 +267,21 @@ void writeTag()
     display.setCursor(.05 * s.x, .05 * s.y);
     display.setTextSize(4);
     display.setTextColor(WHITE);
-    display.print("Room 33");
+    display.print(device.room);
     display.setCursor(.05 * s.x, .2 * s.y);
-    display.print("Patient Name");
+    display.print(device.patientname);
 
     display.setTextSize(2);
 
     display.setCursor(.05 * s.x, .5 * s.y);
-    display.print("Needs");
+    display.print(device.needs);
 
     s.rerender = false;
   }
   display.setTextSize(2);
 
   display.setCursor(.1 * s.x, .7 * s.y);
-  display.print("Time since checked");
+  display.print(String(device.lastChecked) + " Last Checked");
 
   // Print IP
   display.setCursor(.1 * s.x, .9 * s.y);
@@ -419,7 +424,7 @@ void updateKeelStruct()
     {
       Serial.println("\nConnected to server!");
 
-      // Add a scoping block for HTTPClient https to make sure it is destroyed before WiFiClientSecure *client is
+      // SEND STAFF REQ
       HTTPClient https;
 
       Serial.print("[HTTPS] begin...\n");
@@ -442,7 +447,50 @@ void updateKeelStruct()
           if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
           {
             String pay = https.getString();
+            // Serial.println(pay);
+            parseTag(&pay);
+          }
+          else
+          {
+            String pay = https.getString();
             Serial.println(pay);
+          }
+        }
+        else
+        {
+          Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
+        }
+
+        https.end();
+      }
+      else
+      {
+        Serial.printf("[HTTPS] Unable to connect\n");
+      }
+
+      // THEN SEND TAG REQ
+
+      Serial.print("[HTTPS] begin...\n");
+      if (https.begin(*client, host, 443, "/Web", true))
+      { // HTTPS
+        Serial.print("[HTTPS] POST...\n");
+        // start connection and send HTTP header
+        // https.addHeader("Content-Type", "application/json");
+        https.addHeader("Content-Type", "application/graphql");
+        int httpCode = https.POST(patientQuery);
+
+        // httpCode will be negative on error
+        if (httpCode > 0)
+        {
+
+          // HTTP header has been send and Server response header has been handled
+          Serial.printf("[HTTPS] POST... code: %d\n", httpCode);
+
+          // file found at server
+          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
+          {
+            String pay = https.getString();
+            // Serial.println(pay);
             parseStaff(&pay);
           }
           else
@@ -491,13 +539,25 @@ void parseStaff(String *payload)
   for (auto obj : a)
   {
     // serializeJsonPretty(obj["node"]["name"], Serial);
-    unsigned char id = obj["node"]["id"].as<unsigned char>();
-    unsigned char name = obj["node"]["name"].as<unsigned char>();
-
-    staff_array[index] = {id, name, false, false};
-
+    staff_array[index].id = obj["node"]["id"].as<String>();
+    staff_array[index].name = obj["node"]["name"].as<String>();
     Serial.println(staff_array[index].name);
 
     index++;
   }
+}
+
+void parseTag(String *payload)
+{
+  // https://stackoverflow.com/questions/10162152/how-to-work-with-string-fields-in-a-c-struct
+
+  char p[payload->length() + 1];
+  payload->toCharArray(p, payload->length() + 1);
+
+  StaticJsonDocument<400> doc;
+  deserializeJson(doc, p);
+  serializeJsonPretty(doc, Serial);
+
+  device.id = doc["data"]["getTag"]["id"].as<String>();
+  device.room = doc["data"]["getTag"]["room"]["name"].as<String>();
 }
