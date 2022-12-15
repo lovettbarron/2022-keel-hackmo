@@ -20,6 +20,7 @@ model Staff {
 model Room {
     fields {
         name Text
+        patient Patient[] // shouldn't need to be repeated due to unique constraint
     }
 
     operations {
@@ -40,7 +41,7 @@ model Patient {
         name Text
         age Number
         checkin Checkin[]
-        room Room
+        room Room @unique
     }
 
     operations {
