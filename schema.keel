@@ -45,7 +45,6 @@ model Patient {
 
     operations {
         get getPatient(id)
-        get getPatientByRoom(room.id)
         list listAllPatient()
         delete deletePatient(id)
         create createPatient() with (name, room.id, age)
