@@ -20,7 +20,6 @@ model Staff {
 model Room {
     fields {
         name Text
-        patient Patient[] // shouldn't need to be repeated due to unique constraint
     }
 
     operations {
@@ -46,6 +45,7 @@ model Patient {
 
     operations {
         get getPatient(id)
+        get getPatientByRoom(room.id)
         list listAllPatient()
         delete deletePatient(id)
         create createPatient() with (name, room.id, age)
