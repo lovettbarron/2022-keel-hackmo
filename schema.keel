@@ -20,6 +20,7 @@ model Staff {
 model Room {
     fields {
         name Text
+        patients Patient[]
     }
 
     operations {
