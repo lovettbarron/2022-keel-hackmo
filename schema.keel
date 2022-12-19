@@ -88,7 +88,8 @@ model Need {
 
     operations {
         get getNeed(id)
-        list listAllNeed(exclPatientId: ID) {
+        list listAllNeed()
+        list listAvailableNeed(exclPatientId: ID) {
             @where(need.patients.id != exclPatientId)
         }
         delete deleteNeed(id)
