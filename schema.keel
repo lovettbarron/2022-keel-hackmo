@@ -133,6 +133,7 @@ model PatientNeed {
 
     operations {
         create createPatientNeed() with (patientId, needId)
+        list listPatientNeeds(patient.id?, need.id?)
     }
 
     @permission(
